@@ -1,79 +1,119 @@
 import { TaskData } from '../types';
-import { CheckCircle2, FileText, PlayCircle, HelpCircle, ChevronDown } from 'lucide-react';
+import { CheckCircle2, FileText, PlayCircle, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { useState, useRef, useEffect } from 'react';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export default function Sidebar({ data }: { data: TaskData }) {
-  return (
-    <aside className="w-80 flex flex-col gap-4 p-4 h-[calc(100vh-3.5rem)] overflow-y-auto bg-gray-50/50">
-      {/* Progress Card */}
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-xs text-gray-400">当前学习的任务</span>
-          <span className="text-xs text-gray-400">进度 {data.progress}%</span>
-        </div>
-        <div className="flex items-center justify-between group cursor-pointer">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-indigo-500" />
-            <h2 className="font-bold text-gray-900 line-clamp-1">{data.title}</h2>
-          </div>
-          <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
-        </div>
+// Helper component for expandable tag lists
+function ExpandableTagList({ 
+  title, 
+  items, 
+  colorClass, 
+  emptyMessage = "暂无" 
+}: { 
+  title: string, 
+  items: string[], 
+  colorClass: string,
+  emptyMessage?: string
+}) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-        <div className="mt-6 space-y-4">
-          <div className="flex flex-wrap gap-2">
-            <span className="text-xs text-gray-400 w-full mb-1">知识点</span>
-            {data.knowledgePoints.map(point => (
-              <span key={point} className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-[10px]">{point}</span>
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (containerRef.current) {
+        // A typical line height for these tags is around 24px (including gap). 
+        // Two lines would be ~48px. We check if scrollHeight exceeds this.
+        // 56px gives a bit of buffer for 2 lines + gaps.
+        setIsOverflowing(containerRef.current.scrollHeight > 56);
+      }
+    };
+
+    checkOverflow();
+    window.addEventListener('resize', checkOverflow);
+    return () => window.removeEventListener('resize', checkOverflow);
+  }, [items]);
+
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-xs text-gray-400">{title}</span>
+      {items.length === 0 ? (
+        <span className="text-[10px] text-gray-300 italic">{emptyMessage}</span>
+      ) : (
+        <div className="relative">
+          <div 
+            ref={containerRef}
+            className={cn(
+              "flex flex-wrap gap-2 transition-all duration-300 ease-in-out overflow-hidden",
+              !isExpanded && isOverflowing ? "max-h-[52px]" : "max-h-[500px]"
+            )}
+          >
+            {items.map(point => (
+              <span key={point} className={cn("px-2 py-1 border rounded text-[10px]", colorClass)}>
+                {point}
+              </span>
             ))}
-            <button className="text-[10px] text-gray-400 hover:text-gray-600">展开</button>
           </div>
           
-          <div className="flex flex-wrap gap-2">
-            <span className="text-xs text-gray-400 w-full mb-1">专业技能点</span>
-            {data.professionalSkills.length === 0 && <span className="text-[10px] text-gray-300 italic">暂无</span>}
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <span className="text-xs text-gray-400 w-full mb-1">通用技能点</span>
-            {data.generalSkills.map(point => (
-              <span key={point} className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-[10px]">{point}</span>
-            ))}
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <span className="text-xs text-gray-400 w-full mb-1">素养点</span>
-            {data.competencyPoints.map(point => (
-              <span key={point} className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-[10px]">{point}</span>
-            ))}
-            <button className="text-[10px] text-gray-400 hover:text-gray-600">展开</button>
-          </div>
+          {isOverflowing && (
+            <button 
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="flex items-center gap-1 text-[10px] text-indigo-500 hover:text-indigo-700 mt-1.5 transition-colors font-medium"
+            >
+              {isExpanded ? (
+                <>收起 <ChevronUp className="w-3 h-3" /></>
+              ) : (
+                <>展开 <ChevronDown className="w-3 h-3" /></>
+              )}
+            </button>
+          )}
         </div>
-      </div>
+      )}
+    </div>
+  );
+}
 
-      {/* Navigation Menu */}
-      <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-        <div className="p-2 space-y-1">
-          <button className="w-full text-left px-4 py-3 text-sm font-medium text-indigo-600 bg-indigo-50/50 rounded-xl transition-colors">
-            任务情景描述
-          </button>
-          <button className="w-full text-left px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-xl transition-colors">
-            任务目标
-          </button>
-          <div className="flex items-center justify-between w-full px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer">
-            <span>任务步骤</span>
-            <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">共 {data.steps.length} 步</span>
-          </div>
+export default function Sidebar({ data }: { data: TaskData }) {
+  return (
+    <aside className="w-80 flex flex-col gap-4 p-4 h-[calc(100vh-3.5rem)] overflow-y-auto bg-gray-50/50 relative">
+      {/* Tags Card */}
+      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <h3 className="text-sm font-bold text-gray-900 mb-4">能力目标</h3>
+        <div className="space-y-4">
+          <ExpandableTagList 
+            title="知识点" 
+            items={data.knowledgePoints} 
+            colorClass="bg-blue-50 text-blue-600 border-blue-100" 
+          />
+          
+          <ExpandableTagList 
+            title="专业技能点" 
+            items={data.professionalSkills} 
+            colorClass="bg-emerald-50 text-emerald-600 border-emerald-100" 
+          />
+
+          <ExpandableTagList 
+            title="通用技能点" 
+            items={data.generalSkills} 
+            colorClass="bg-amber-50 text-amber-600 border-amber-100" 
+          />
+
+          <ExpandableTagList 
+            title="素养点" 
+            items={data.competencyPoints} 
+            colorClass="bg-purple-50 text-purple-600 border-purple-100" 
+          />
         </div>
       </div>
 
       {/* Activities List */}
       <div className="space-y-3">
-        <h3 className="text-sm font-bold text-gray-900 px-1">任务学习活动 ({data.activities.length})</h3>
+        <h3 className="text-sm font-bold text-gray-900 px-1">任务 ({data.activities.length})</h3>
         {data.activities.map(activity => (
           <div key={activity.id} className="bg-white p-3 rounded-2xl flex items-center gap-3 shadow-sm border border-gray-100 hover:border-indigo-200 transition-all cursor-pointer group">
             <div className={cn(
@@ -99,3 +139,4 @@ export default function Sidebar({ data }: { data: TaskData }) {
     </aside>
   );
 }
+
