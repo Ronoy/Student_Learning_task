@@ -2,7 +2,7 @@ import { ArrowLeft, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { TaskData } from '../types';
 import { useState, useRef, useEffect } from 'react';
 
-export default function Header({ data }: { data: TaskData }) {
+export default function Header({ data, onNavigateHome }: { data: TaskData, onNavigateHome: () => void }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -27,11 +27,19 @@ export default function Header({ data }: { data: TaskData }) {
   return (
     <header className="flex items-center justify-between h-14 px-6 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30">
       <div className="flex items-center">
-        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors mr-4">
+        <button 
+          onClick={onNavigateHome}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors mr-4"
+        >
           <ArrowLeft className="w-5 h-5 text-gray-600" />
         </button>
         <nav className="flex items-center text-sm text-gray-500">
-          <span className="hover:text-gray-900 cursor-pointer">学习中心</span>
+          <span 
+            onClick={onNavigateHome}
+            className="hover:text-gray-900 cursor-pointer"
+          >
+            学习中心
+          </span>
           <span className="mx-2">/</span>
           
           <div className="relative" ref={dropdownRef}>

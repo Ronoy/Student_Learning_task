@@ -3,7 +3,13 @@ import { motion } from 'motion/react';
 import { useState } from 'react';
 import PreviewModal from './PreviewModal';
 import Markdown from 'react-markdown';
-import { FileText, Presentation } from 'lucide-react';
+import { FileText, Presentation, CheckCircle2 } from 'lucide-react';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 export default function ContentArea({ data }: { data: TaskData }) {
   const [preview, setPreview] = useState<{
@@ -153,31 +159,36 @@ export default function ContentArea({ data }: { data: TaskData }) {
             <h2 className="text-2xl font-bold text-gray-900">任务步骤</h2>
           </div>
           
-          <div className="space-y-10">
+          <div className="space-y-16">
             {data.steps.map((step, index) => (
-              <div key={step.id} className="relative pl-8">
-                {/* Connector Line */}
-                {index !== data.steps.length - 1 && (
-                  <div className="absolute left-[11px] top-8 bottom-[-40px] w-0.5 bg-gray-100" />
+              <motion.div 
+                key={step.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className={cn(
+                  "flex flex-col md:flex-row gap-8 items-start",
+                  index % 2 === 1 && "md:flex-row-reverse"
                 )}
-                
-                <div className="flex items-start gap-4">
-                  <div className="absolute left-0 top-1 flex flex-col items-center">
-                    <div className="w-6 h-6 rounded-full bg-indigo-50 flex items-center justify-center border-2 border-indigo-500 z-10">
-                      <div className="w-2 h-2 rounded-full bg-indigo-500" />
+              >
+                {/* Text Content */}
+                <div className="flex-1 space-y-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-lg shadow-indigo-200">
+                      {index + 1}
                     </div>
+                    <h4 className="text-xl font-bold text-gray-900">{step.title}</h4>
                   </div>
                   
-                  <div className="space-y-4 flex-1">
-                    <div className="flex items-center gap-3">
-                      <span className="text-indigo-600 font-bold">步骤{index + 1}</span>
-                      <h4 className="text-lg font-bold text-gray-900">{step.title}</h4>
-                    </div>
-                    
+                  <div className="space-y-4">
+                    {step.description && (
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        {step.description}
+                      </p>
+                    )}
+
                     <div className="flex flex-wrap gap-2">
-                      <span className="text-xs text-gray-400 mr-2">能力项</span>
                       {step.tags.map(tag => {
-                        // Determine color based on tag content matching the arrays in MOCK_DATA
                         let colorClass = "bg-gray-50 text-gray-500 border-gray-100";
                         if (data.knowledgePoints.includes(tag)) {
                           colorClass = "bg-blue-50 text-blue-600 border-blue-100";
@@ -197,15 +208,42 @@ export default function ContentArea({ data }: { data: TaskData }) {
                       })}
                     </div>
                     
-                    <div className="flex items-start gap-3">
-                      <span className="text-xs text-gray-400 mt-1 shrink-0">步骤要求</span>
-                      <p className="text-sm text-gray-600 leading-relaxed">
+                    <div className="bg-indigo-50/50 border border-indigo-100/50 rounded-2xl p-5">
+                      <h5 className="text-xs font-bold text-indigo-900 mb-2 flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4" />
+                        达成要求
+                      </h5>
+                      <p className="text-sm text-indigo-700 leading-relaxed">
                         {step.requirement}
                       </p>
                     </div>
                   </div>
                 </div>
-              </div>
+
+                {/* Step Image */}
+                {step.imageUrl && (
+                  <div className="w-full md:w-[400px] shrink-0">
+                    <motion.div 
+                      whileHover={{ scale: 1.02 }}
+                      onClick={() => openPreview('image', step.imageUrl!, step.title)}
+                      className="aspect-[4/3] rounded-3xl overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer shadow-xl group relative"
+                    >
+                      <img 
+                        src={step.imageUrl} 
+                        alt={step.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
+                      <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="bg-white/90 backdrop-blur px-3 py-1.5 rounded-full text-[10px] font-bold text-gray-900 shadow-lg">
+                          点击查看大图
+                        </div>
+                      </div>
+                    </motion.div>
+                  </div>
+                )}
+              </motion.div>
             ))}
           </div>
         </section>

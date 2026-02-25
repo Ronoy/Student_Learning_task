@@ -6,7 +6,9 @@
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import ContentArea from './components/ContentArea';
+import LearningCenter from './components/LearningCenter';
 import { TaskData } from './types';
+import { useState } from 'react';
 
 const MOCK_DATA: TaskData = {
   title: "减速箱三维建模与装配",
@@ -21,30 +23,34 @@ const MOCK_DATA: TaskData = {
     {
       id: '1',
       title: "完成箱体基础特征建模",
-      description: "",
+      description: "根据二维草图尺寸，使用拉伸、切除、圆角等命令完成下箱体和上盖的主体结构建模，注意壁厚均匀和拔模斜度的设置。",
       tags: ["3.1.1 复杂零件特征建模", "4.2.1 空间想象能力", "1.1 三维建模基础理论", "2.2 规范的设计习惯"],
-      requirement: "根据二维草图尺寸，使用拉伸、切除、圆角等命令完成下箱体和上盖的主体结构建模，注意壁厚均匀和拔模斜度的设置。"
+      requirement: "根据二维草图尺寸，使用拉伸、切除、圆角等命令完成下箱体和上盖的主体结构建模，注意壁厚均匀和拔模斜度的设置。",
+      imageUrl: "https://picsum.photos/seed/gearbox1/800/600"
     },
     {
       id: '2',
       title: "添加轴承孔与定位孔",
-      description: "",
+      description: "通过异形孔向导功能生成标准轴承孔、螺纹孔和销钉孔。定位孔需严格按照图纸标注形位公差，确保装配精度。",
       tags: ["3.1.1 复杂零件特征建模", "4.1 公差与配合"],
-      requirement: "通过异形孔向导功能生成标准轴承孔、螺纹孔和销钉孔。定位孔需严格按照图纸标注形位公差，确保装配精度。"
+      requirement: "通过异形孔向导功能生成标准轴承孔、螺纹孔和销钉孔。定位孔需严格按照图纸标注形位公差，确保装配精度。",
+      imageUrl: "https://picsum.photos/seed/gearbox2/800/600"
     },
     {
       id: '3',
       title: "齿轮与轴类零件建模",
-      description: "",
+      description: "使用旋转特征生成齿轮毛坯和阶梯轴，利用方程式或齿轮生成工具创建渐开线齿廓，完成键槽的切除特征。",
       tags: ["3.1.1 复杂零件特征建模", "3.2 齿轮传动原理"],
-      requirement: "使用旋转特征生成齿轮毛坯和阶梯轴，利用方程式或齿轮生成工具创建渐开线齿廓，完成键槽的切除特征。"
+      requirement: "使用旋转特征生成齿轮毛坯和阶梯轴，利用方程式或齿轮生成工具创建渐开线齿廓，完成键槽的切除特征。",
+      imageUrl: "https://picsum.photos/seed/gearbox3/800/600"
     },
     {
       id: '4',
       title: "减速箱虚拟装配与干涉检查",
-      description: "",
+      description: "将所有零件导入装配体，添加同轴心、重合、齿轮等配合关系。运行干涉检查，确保齿轮啮合正确且无实体干涉。",
       tags: ["3.1.2 装配体约束与配合", "3.1.3 干涉检查与分析", "2.1 严谨的工程态度"],
-      requirement: "将所有零件导入装配体，添加同轴心、重合、齿轮等配合关系。运行干涉检查，确保齿轮啮合正确且无实体干涉。"
+      requirement: "将所有零件导入装配体，添加同轴心、重合、齿轮等配合关系。运行干涉检查，确保齿轮啮合正确且无实体干涉。",
+      imageUrl: "https://picsum.photos/seed/gearbox4/800/600"
     }
   ],
   activities: [
@@ -70,13 +76,21 @@ const MOCK_DATA: TaskData = {
 };
 
 export default function App() {
+  const [currentView, setCurrentView] = useState<'home' | 'task'>('home');
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
-      <Header data={MOCK_DATA} />
-      <div className="flex flex-1 overflow-hidden">
-        <ContentArea data={MOCK_DATA} />
-        <Sidebar data={MOCK_DATA} />
-      </div>
+      {currentView === 'task' ? (
+        <>
+          <Header data={MOCK_DATA} onNavigateHome={() => setCurrentView('home')} />
+          <div className="flex flex-1 overflow-hidden">
+            <ContentArea data={MOCK_DATA} />
+            <Sidebar data={MOCK_DATA} />
+          </div>
+        </>
+      ) : (
+        <LearningCenter onTaskSelect={() => setCurrentView('task')} />
+      )}
       
       {/* Floating AI Assistant Button */}
       <div className="fixed bottom-6 right-6 z-50">
