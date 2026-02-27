@@ -8,10 +8,11 @@ import {
   AlertCircle, 
   FileQuestion, 
   ListTodo,
-  ChevronRight
+  ChevronRight,
+  ArrowLeft
 } from 'lucide-react';
 
-export default function LearningCenter({ onTaskSelect }: { onTaskSelect: () => void }) {
+export default function LearningCenter({ onTaskSelect, onBack }: { onTaskSelect: () => void, onBack: () => void }) {
   const projects = [
     {
       id: 1,
@@ -44,9 +45,17 @@ export default function LearningCenter({ onTaskSelect }: { onTaskSelect: () => v
     <div className="min-h-screen bg-gray-50 flex flex-col w-full font-sans">
       <header className="bg-white border-b border-gray-200 px-8 py-6 shrink-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">我的学习中心</h1>
-            <p className="text-gray-500 mt-1 text-sm">欢迎回来，赵老师同学，今天想学习什么？</p>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={onBack}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </button>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">我的学习中心</h1>
+              <p className="text-gray-500 mt-1 text-sm">欢迎回来，赵老师同学，今天想学习什么？</p>
+            </div>
           </div>
           <div className="flex gap-4">
             <div className="bg-indigo-50 px-4 py-2 rounded-xl flex items-center gap-3 border border-indigo-100">

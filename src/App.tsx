@@ -7,6 +7,7 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import ContentArea from './components/ContentArea';
 import LearningCenter from './components/LearningCenter';
+import CourseList from './components/CourseList';
 import { TaskData } from './types';
 import { useState } from 'react';
 
@@ -76,20 +77,22 @@ const MOCK_DATA: TaskData = {
 };
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'home' | 'task'>('home');
+  const [currentView, setCurrentView] = useState<'courseList' | 'learningCenter' | 'task'>('courseList');
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       {currentView === 'task' ? (
         <>
-          <Header data={MOCK_DATA} onNavigateHome={() => setCurrentView('home')} />
+          <Header data={MOCK_DATA} onNavigateHome={() => setCurrentView('learningCenter')} />
           <div className="flex flex-1 overflow-hidden">
             <ContentArea data={MOCK_DATA} />
             <Sidebar data={MOCK_DATA} />
           </div>
         </>
+      ) : currentView === 'learningCenter' ? (
+        <LearningCenter onTaskSelect={() => setCurrentView('task')} onBack={() => setCurrentView('courseList')} />
       ) : (
-        <LearningCenter onTaskSelect={() => setCurrentView('task')} />
+        <CourseList onCourseSelect={() => setCurrentView('learningCenter')} />
       )}
       
       {/* Floating AI Assistant Button */}
