@@ -5,6 +5,7 @@ export interface TaskStep {
   tags: string[];
   requirement: string;
   imageUrl?: string;
+  imageUrls?: string[];
 }
 
 export interface LearningActivity {

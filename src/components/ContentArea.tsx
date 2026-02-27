@@ -1,14 +1,106 @@
-import { TaskData } from '../types';
-import { motion } from 'motion/react';
+import { TaskData, TaskStep } from '../types';
+import { motion, AnimatePresence } from 'motion/react';
 import { useState } from 'react';
 import PreviewModal from './PreviewModal';
 import Markdown from 'react-markdown';
-import { FileText, Presentation, CheckCircle2 } from 'lucide-react';
+import { FileText, Presentation, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+function StepImageGallery({ step, onPreview }: { step: TaskStep, onPreview: (src: string, title: string) => void }) {
+  const images = step.imageUrls && step.imageUrls.length > 0 
+    ? step.imageUrls 
+    : step.imageUrl 
+      ? [step.imageUrl] 
+      : [];
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  if (images.length === 0) return null;
+
+  const handlePrev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
+  return (
+    <div className="w-full md:w-[400px] shrink-0 flex flex-col gap-3">
+      <motion.div 
+        whileHover={{ scale: 1.02 }}
+        onClick={() => onPreview(images[currentIndex], step.title)}
+        className="aspect-[4/3] rounded-3xl overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer shadow-xl group relative"
+      >
+        <AnimatePresence mode="wait">
+          <motion.img 
+            key={currentIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            src={images[currentIndex]} 
+            alt={`${step.title} - Image ${currentIndex + 1}`} 
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            referrerPolicy="no-referrer"
+          />
+        </AnimatePresence>
+        
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
+        
+        {images.length > 1 && (
+          <>
+            <button 
+              onClick={handlePrev}
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={handleNext}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+            <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-md px-2 py-1 rounded-md text-[10px] font-bold text-white shadow-sm">
+              {currentIndex + 1} / {images.length}
+            </div>
+          </>
+        )}
+
+        <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="bg-white/90 backdrop-blur px-3 py-1.5 rounded-full text-[10px] font-bold text-gray-900 shadow-lg">
+            点击查看大图
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Thumbnails */}
+      {images.length > 1 && (
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          {images.map((img, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentIndex(idx)}
+              className={cn(
+                "w-16 h-12 shrink-0 rounded-lg overflow-hidden border-2 transition-all",
+                currentIndex === idx ? "border-indigo-500 shadow-md" : "border-transparent opacity-60 hover:opacity-100"
+              )}
+            >
+              <img src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function ContentArea({ data }: { data: TaskData }) {
@@ -65,7 +157,7 @@ export default function ContentArea({ data }: { data: TaskData }) {
                   </div>
                 </div>
                 <div className="absolute top-4 left-4">
-                  <span className="text-[10px] font-bold text-white bg-indigo-600 px-2 py-1 rounded shadow-sm">VIDEO</span>
+                  <span className="text-[10px] font-bold text-white bg-indigo-600 px-2 py-1 rounded shadow-sm">视频</span>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
                   <p className="text-white text-xs font-medium">任务演示：减速箱装配全过程</p>
@@ -92,7 +184,7 @@ export default function ContentArea({ data }: { data: TaskData }) {
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute top-4 left-4">
-                  <span className="text-[10px] font-bold text-white bg-emerald-600 px-2 py-1 rounded shadow-sm">IMAGE</span>
+                  <span className="text-[10px] font-bold text-white bg-emerald-600 px-2 py-1 rounded shadow-sm">图片</span>
                 </div>
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
                 <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
@@ -113,7 +205,7 @@ export default function ContentArea({ data }: { data: TaskData }) {
                 <h4 className="font-medium text-gray-800">项目启动汇报</h4>
                 <p className="text-xs text-gray-500 mt-1">PPTX · 2.4 MB</p>
                 <div className="absolute top-4 left-4">
-                  <span className="text-[10px] font-bold text-orange-600 bg-orange-100 px-2 py-1 rounded shadow-sm">PPT</span>
+                  <span className="text-[10px] font-bold text-orange-600 bg-orange-100 px-2 py-1 rounded shadow-sm">演示</span>
                 </div>
               </motion.div>
 
@@ -130,7 +222,7 @@ export default function ContentArea({ data }: { data: TaskData }) {
                 <h4 className="font-medium text-gray-800">减速箱设计规范</h4>
                 <p className="text-xs text-gray-500 mt-1">PDF · 1.8 MB</p>
                 <div className="absolute top-4 left-4">
-                  <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded shadow-sm">DOC</span>
+                  <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded shadow-sm">文档</span>
                 </div>
               </motion.div>
             </div>
@@ -221,28 +313,7 @@ export default function ContentArea({ data }: { data: TaskData }) {
                 </div>
 
                 {/* Step Image */}
-                {step.imageUrl && (
-                  <div className="w-full md:w-[400px] shrink-0">
-                    <motion.div 
-                      whileHover={{ scale: 1.02 }}
-                      onClick={() => openPreview('image', step.imageUrl!, step.title)}
-                      className="aspect-[4/3] rounded-3xl overflow-hidden bg-gray-100 border border-gray-200 cursor-pointer shadow-xl group relative"
-                    >
-                      <img 
-                        src={step.imageUrl} 
-                        alt={step.title} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
-                      <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="bg-white/90 backdrop-blur px-3 py-1.5 rounded-full text-[10px] font-bold text-gray-900 shadow-lg">
-                          点击查看大图
-                        </div>
-                      </div>
-                    </motion.div>
-                  </div>
-                )}
+                <StepImageGallery step={step} onPreview={(src, title) => openPreview('image', src, title)} />
               </motion.div>
             ))}
           </div>

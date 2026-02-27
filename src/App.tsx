@@ -27,7 +27,11 @@ const MOCK_DATA: TaskData = {
       description: "根据二维草图尺寸，使用拉伸、切除、圆角等命令完成下箱体和上盖的主体结构建模，注意壁厚均匀和拔模斜度的设置。",
       tags: ["3.1.1 复杂零件特征建模", "4.2.1 空间想象能力", "1.1 三维建模基础理论", "2.2 规范的设计习惯"],
       requirement: "根据二维草图尺寸，使用拉伸、切除、圆角等命令完成下箱体和上盖的主体结构建模，注意壁厚均匀和拔模斜度的设置。",
-      imageUrl: "https://picsum.photos/seed/gearbox1/800/600"
+      imageUrls: [
+        "https://picsum.photos/seed/gearbox1/800/600",
+        "https://picsum.photos/seed/gearbox1_detail/800/600",
+        "https://picsum.photos/seed/gearbox1_sketch/800/600"
+      ]
     },
     {
       id: '2',
@@ -78,6 +82,7 @@ const MOCK_DATA: TaskData = {
 
 export default function App() {
   const [currentView, setCurrentView] = useState<'courseList' | 'learningCenter' | 'task'>('courseList');
+  const [selectedCourse, setSelectedCourse] = useState<any>(null);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
@@ -90,9 +95,9 @@ export default function App() {
           </div>
         </>
       ) : currentView === 'learningCenter' ? (
-        <LearningCenter onTaskSelect={() => setCurrentView('task')} onBack={() => setCurrentView('courseList')} />
+        <LearningCenter course={selectedCourse} onTaskSelect={() => setCurrentView('task')} onBack={() => setCurrentView('courseList')} />
       ) : (
-        <CourseList onCourseSelect={() => setCurrentView('learningCenter')} />
+        <CourseList onCourseSelect={(course) => { setSelectedCourse(course); setCurrentView('learningCenter'); }} />
       )}
       
       {/* Floating AI Assistant Button */}
