@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { useState } from 'react';
 import { 
   BookOpen, 
   Clock, 
@@ -12,12 +13,21 @@ import {
   ArrowLeft,
   Bot,
   Target,
-  ChevronDown
+  ChevronDown,
+  Network,
+  Map,
+  MessageSquare,
+  Settings2,
+  X
 } from 'lucide-react';
 
-export default function LearningCenter({ course, onTaskSelect, onBack }: { course?: any, onTaskSelect: () => void, onBack: () => void }) {
-  const isChapterBased = course?.type === '章节式';
+export default function LearningCenter({ course, onTaskSelect, onBack, onNavigateToGraph, onNavigateToPath }: { course?: any, onTaskSelect: () => void, onBack: () => void, onNavigateToGraph?: () => void, onNavigateToPath?: () => void }) {
+  const isChapterBased = course?.type === '章节模式';
   const courseTitle = course?.title || "智能装备机械系统设计";
+  
+  const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
+  const [goalName, setGoalName] = useState('期末冲刺优秀');
+  const [goalDescription, setGoalDescription] = useState('熟练掌握所有核心知识点，能够独立完成综合性项目设计。');
 
   const projects = [
     {
@@ -115,6 +125,29 @@ export default function LearningCenter({ course, onTaskSelect, onBack }: { cours
             </div>
           </div>
           <div className="flex gap-4">
+            {isChapterBased && (
+              <div className="flex items-center gap-2 mr-4 border-r border-gray-200 pr-6">
+                <button 
+                  onClick={onNavigateToGraph}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
+                >
+                  <Network className="w-4 h-4" />
+                  知识图谱
+                </button>
+                <button 
+                  onClick={onNavigateToPath}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <Map className="w-4 h-4" />
+                  推荐路径
+                </button>
+                <div className="w-px h-4 bg-gray-200 mx-2" />
+                <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                  <MessageSquare className="w-4 h-4" />
+                  话题讨论
+                </button>
+              </div>
+            )}
             <div className="bg-indigo-50 px-4 py-2 rounded-xl flex items-center gap-3 border border-indigo-100">
               <div className="p-1.5 bg-indigo-100 rounded-lg text-indigo-600">
                 <BookOpen className="w-4 h-4" />
@@ -342,10 +375,16 @@ export default function LearningCenter({ course, onTaskSelect, onBack }: { cours
           {/* Right: Stats & Todo */}
           <div className="space-y-8">
             {/* Course Mastery */}
-            <section className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+            <section className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm relative">
               <h3 className="text-sm font-bold text-gray-900 mb-6 flex items-center justify-between">
                 课程掌握度
-                <button className="text-[10px] text-indigo-600 hover:underline">查看详情</button>
+                <button 
+                  onClick={() => setIsGoalModalOpen(true)}
+                  className="text-[10px] text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded-md transition-colors flex items-center gap-1"
+                >
+                  <Settings2 className="w-3 h-3" />
+                  设置学习目标
+                </button>
               </h3>
               <div className="flex flex-col items-center">
                 <div className="relative w-32 h-32 flex items-center justify-center mb-4">
@@ -359,7 +398,10 @@ export default function LearningCenter({ course, onTaskSelect, onBack }: { cours
                   </svg>
                   <span className="absolute text-2xl font-bold text-gray-900">{isChapterBased ? '18%' : '0%'}</span>
                 </div>
-                <p className="text-xs text-gray-400 text-center">继续加油！您已经开启了学习之旅</p>
+                <div className="text-center mt-2">
+                  <p className="text-xs text-indigo-500 font-medium mb-1">当前目标：{goalName}</p>
+                  <p className="text-[10px] text-gray-400">系统将根据目标统计掌握度</p>
+                </div>
               </div>
             </section>
 
@@ -411,6 +453,74 @@ export default function LearningCenter({ course, onTaskSelect, onBack }: { cours
           </div>
         </div>
       </main>
+
+      {/* Goal Setting Modal */}
+      {isGoalModalOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl p-6 w-[400px] shadow-xl relative"
+          >
+            <button 
+              onClick={() => setIsGoalModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <Target className="w-5 h-5 text-indigo-600" />
+              自定义学习目标
+            </h3>
+            
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-bold text-gray-700">目标名称</label>
+                  <span className="text-xs text-gray-400">{goalName.length}/50</span>
+                </div>
+                <input 
+                  type="text" 
+                  maxLength={50}
+                  value={goalName}
+                  onChange={(e) => setGoalName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm"
+                  placeholder="例如：期末冲刺、掌握核心技能"
+                />
+              </div>
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-bold text-gray-700">目标描述与需求</label>
+                  <span className="text-xs text-gray-400">{goalDescription.length}/200</span>
+                </div>
+                <textarea 
+                  maxLength={200}
+                  value={goalDescription}
+                  onChange={(e) => setGoalDescription(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm h-24 resize-none"
+                  placeholder="描述您的学习兴趣和具体需求..."
+                />
+              </div>
+              <p className="text-xs text-gray-500 mt-2">系统将根据您设定的目标，动态调整推荐路径并统计课程掌握度。</p>
+            </div>
+            
+            <div className="mt-8 flex justify-end gap-3">
+              <button 
+                onClick={() => setIsGoalModalOpen(false)} 
+                className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+              >
+                取消
+              </button>
+              <button 
+                onClick={() => setIsGoalModalOpen(false)} 
+                className="px-6 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-colors shadow-sm"
+              >
+                保存目标
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

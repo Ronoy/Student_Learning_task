@@ -3,6 +3,7 @@ import { CheckCircle2, FileText, PlayCircle, HelpCircle, ChevronDown, ChevronUp 
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useState, useRef, useEffect } from 'react';
+import { toast } from './Toast';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -115,7 +116,11 @@ export default function Sidebar({ data }: { data: TaskData }) {
       <div className="space-y-3">
         <h3 className="text-sm font-bold text-gray-900 px-1">任务 ({data.activities.length})</h3>
         {data.activities.map(activity => (
-          <div key={activity.id} className="bg-white p-3 rounded-2xl flex items-center gap-3 shadow-sm border border-gray-100 hover:border-indigo-200 transition-all cursor-pointer group">
+          <div 
+            key={activity.id} 
+            onClick={() => toast('暂无内容')}
+            className="bg-white p-3 rounded-2xl flex items-center gap-3 shadow-sm border border-gray-100 hover:border-indigo-200 transition-all cursor-pointer group"
+          >
             <div className={cn(
               "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
               activity.type === 'quiz' ? "bg-cyan-50 text-cyan-500 group-hover:bg-cyan-100" : 

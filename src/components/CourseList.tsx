@@ -19,14 +19,14 @@ export default function CourseList({ onCourseSelect }: { onCourseSelect: (course
       title: "智能装备机械系统设计",
       image: "https://picsum.photos/seed/smart_manufacturing/800/400",
       progress: 13,
-      type: "项目任务式"
+      type: "任务模式"
     },
     {
       id: 2,
       title: "机械原理",
       image: "https://picsum.photos/seed/mechanics/800/400",
       progress: 0,
-      type: "章节式"
+      type: "章节模式"
     }
   ];
 
@@ -123,7 +123,7 @@ export default function CourseList({ onCourseSelect }: { onCourseSelect: (course
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         referrerPolicy="no-referrer"
                       />
-                      <div className={`absolute top-2 left-2 px-2 py-1 rounded text-[10px] font-bold text-white backdrop-blur-sm ${course.type === '项目任务式' ? 'bg-blue-500/80' : 'bg-amber-500/80'}`}>
+                      <div className={`absolute top-2 left-2 px-2 py-1 rounded text-[10px] font-bold text-white backdrop-blur-sm ${course.type === '任务模式' ? 'bg-blue-500/80' : 'bg-amber-500/80'}`}>
                         {course.type}
                       </div>
                     </div>

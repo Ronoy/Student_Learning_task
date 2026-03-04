@@ -1,6 +1,7 @@
 import { ArrowLeft, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { TaskData } from '../types';
 import { useState, useRef, useEffect } from 'react';
+import { toast } from './Toast';
 
 export default function Header({ data, onNavigateHome }: { data: TaskData, onNavigateHome: () => void }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -59,6 +60,12 @@ export default function Header({ data, onNavigateHome }: { data: TaskData, onNav
                 {mockTasks.map((t, i) => (
                   <button 
                     key={i}
+                    onClick={() => {
+                      if (!t.active) {
+                        toast('暂无内容');
+                        setIsDropdownOpen(false);
+                      }
+                    }}
                     className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 flex items-center justify-between ${t.active ? 'text-indigo-600 bg-indigo-50/50' : 'text-gray-700'}`}
                   >
                     <div>

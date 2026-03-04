@@ -8,6 +8,9 @@ import Sidebar from './components/Sidebar';
 import ContentArea from './components/ContentArea';
 import LearningCenter from './components/LearningCenter';
 import CourseList from './components/CourseList';
+import KnowledgeGraph from './components/KnowledgeGraph';
+import RecommendedPath from './components/RecommendedPath';
+import { ToastContainer } from './components/Toast';
 import { TaskData } from './types';
 import { useState } from 'react';
 
@@ -81,11 +84,12 @@ const MOCK_DATA: TaskData = {
 };
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'courseList' | 'learningCenter' | 'task'>('courseList');
+  const [currentView, setCurrentView] = useState<'courseList' | 'learningCenter' | 'task' | 'knowledgeGraph' | 'recommendedPath'>('courseList');
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+      <ToastContainer />
       {currentView === 'task' ? (
         <>
           <Header data={MOCK_DATA} onNavigateHome={() => setCurrentView('learningCenter')} />
@@ -95,7 +99,23 @@ export default function App() {
           </div>
         </>
       ) : currentView === 'learningCenter' ? (
-        <LearningCenter course={selectedCourse} onTaskSelect={() => setCurrentView('task')} onBack={() => setCurrentView('courseList')} />
+        <LearningCenter 
+          course={selectedCourse} 
+          onTaskSelect={() => setCurrentView('task')} 
+          onBack={() => setCurrentView('courseList')} 
+          onNavigateToGraph={() => setCurrentView('knowledgeGraph')}
+          onNavigateToPath={() => setCurrentView('recommendedPath')}
+        />
+      ) : currentView === 'knowledgeGraph' ? (
+        <KnowledgeGraph 
+          course={selectedCourse}
+          onBack={() => setCurrentView('learningCenter')}
+        />
+      ) : currentView === 'recommendedPath' ? (
+        <RecommendedPath 
+          course={selectedCourse}
+          onBack={() => setCurrentView('learningCenter')}
+        />
       ) : (
         <CourseList onCourseSelect={(course) => { setSelectedCourse(course); setCurrentView('learningCenter'); }} />
       )}

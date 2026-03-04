@@ -134,9 +134,18 @@ export default function ContentArea({ data }: { data: TaskData }) {
             <div className="text-gray-600 leading-relaxed prose prose-indigo prose-a:text-indigo-600 hover:prose-a:text-indigo-800 prose-a:no-underline hover:prose-a:underline max-w-none">
               <Markdown>{data.description}</Markdown>
             </div>
-            
-            {/* Multimedia Content Example */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+          </div>
+        </section>
+
+        {/* Section: Resources */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="w-1.5 h-6 bg-indigo-500 rounded-full" />
+            <h2 className="text-2xl font-bold text-gray-900">任务资源</h2>
+          </div>
+          
+          {/* Multimedia Content Example */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -226,7 +235,6 @@ export default function ContentArea({ data }: { data: TaskData }) {
                 </div>
               </motion.div>
             </div>
-          </div>
         </section>
 
         {/* Section: Goal */}
